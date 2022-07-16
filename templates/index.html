@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<center>
+<div class="head">
+<h1>BOOK INVENTORY</h1>
+</div>
+</center>
+<style>
+    .row{
+    width:500px;
+    height:300px;
+    margin-top:50px;
+    margin-left:33%;
+    background:black;
+    padding:200px;
+    }
+    .login{
+    margin-bottom:20px;
+    }
+    button{
+    width:100px;
+    }
+    h1{
+    font-size:bold;
+    color:#400F6B;
+    }
+</style>
+<div class="row">
+    <div class="login">
+        <a href="{% url 'login' %}" ><button>login</button></a>
+    </div>
+    <div class="signup">
+        <a href="{% url 'signup' %}"><button>SignUp</button></a>
+    </div>
+</div>
+
+{% endblock %}

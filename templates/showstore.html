@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<style>
+    .row{
+    height:500px;
+    margin-bottom:30px;
+    }
+    .col{
+    height:500px;
+</style>
+<h1 align="center">{{name}}</h1>
+<div class="container">
+<div class="row">
+{% for i in data %}
+<div class="col-sm-4" id="col">
+<h6>{{i.title}}</h6>
+<aside>{{i.author}}</aside>
+<img src="{{i.img}}" width="200px" height="300px"><br>
+    <h5>{{i.copy}} copies left</h5>
+    <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">update stock
+    <span class="caret"></span></button>
+     <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+        <form action="{% url 'updatecopies' %}" method="POST">
+            {% csrf_token %}
+      <li role="presentation">
+        <input type="number" name="copy" placeholder="enter copies">
+          <input type="hidden" name="idd" value="{{i.bkid}}" >
+          <input type="hidden" name="stname" value="{{i.name}}">
+        <input type="submit" value="update">
+    </li>
+        </form>
+    </ul>
+    <form action="{% url 'deletebook' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="dtid" value="{{i.bkid}}">
+        <input type="hidden" name="ssname" value="{{i.name}}">
+        <input type="submit" value="delete">
+    </form>
+    </div>
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock %}

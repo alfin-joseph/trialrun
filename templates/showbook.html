@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<style>
+    .row{
+    height:500px;
+    }
+</style>
+<center>
+<form method="POST" action="{% url 'showbook' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="text" name="search">
+    <input type="submit" value="search" style="color:white;background:red;">
+</form>
+<div class="container">
+<div class="row">
+{% for i in bookdata %}
+<div class="col-sm-6">
+<h4>{{i.title}}</h4>
+<aside>{{i.author}}</aside>
+<img src="{{i.img}}" width="300px" height="400px"><br>
+      <div class="dropdown">
+    <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">ADD TO STORE
+    <span class="caret"></span></button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+        <form action="{% url 'strbook' %}" method="POST">
+            {% csrf_token %}
+      <li role="presentation">
+          {% for j in stname %}
+        <input type="hidden" name="id" value="{{i.bkid}}">
+        <input type="submit" name="name" value="{{j.store_name}}" style="color:black;background:#ECD8D8;width:100px;"></br>
+          {% endfor %}
+    </li>
+        </form>
+    </ul>
+  </div>
+</div>
+{% endfor %}
+</div>
+    </div>
+    </center>
+{% endblock %}

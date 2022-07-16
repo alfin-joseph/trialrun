@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<style>
+    .search{
+    margin-top:300px;
+    }
+    body{
+    background:#99E3EF;
+    }
+
+
+</style>
+<div class="search">
+    <center>
+<form method="POST" action="{% url 'showbook' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="text" name="search">
+    <input type="submit" value="serach" style="background:#EDD7C5;">
+</form>
+        </center>
+    </div>
+{% endblock %}
