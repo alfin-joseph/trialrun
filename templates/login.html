@@ -1,11 +1,30 @@
 {% extends 'base.html' %}
 {% block body_block %}
+<style>
+    .login{
+    margin-top:150px;
+    background:#778899;
+    height:300px;
+    width:300px;
+    }
+    form{
+    padding:50px;
+    }
+    .btn{
+    margin-top:10px;
+    width:100px;
+    }
+</style>
+<center>
+<div class="login">
 <form method="POST">
     {% csrf_token %}
-    <label>username</label>
-    <input type="text" placeholder="enter username" name="username">
-    <label>password</label>
-    <input type="password" placeholder="enter password" name="password">
-    <input type="submit">
+    <label>username</label><br>
+    <input type="text" placeholder="enter username" name="username"><br>
+    <label>password</label><br>
+    <input type="password" placeholder="enter password" name="password"><br>
+    <input type="submit" value="login" class="btn btn-danger">
 </form>
+    </div>
+    </center>
 {% endblock %}

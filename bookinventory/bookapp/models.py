@@ -8,12 +8,12 @@ class CustomUser(AbstractUser):
     is_admin = models.BooleanField(default=False)
     is_user = models.BooleanField(default=False)
 class Store(models.Model):
-    store_name = models.CharField(max_length=20)
+    store_name = models.CharField(max_length=20,unique=True)
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE,related_name='user',verbose_name='Owner')
     def __str__(self):
         return self.store_name
 class Book(models.Model):
-    Book_id = models.CharField(max_length=100)
+    Book_id = models.CharField(max_length=100,unique=True)
     no_copis = models.IntegerField(null=True)
     store = models.ForeignKey(Store,on_delete=models.CASCADE,related_name='store')
     def __str__(self):

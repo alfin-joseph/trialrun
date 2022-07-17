@@ -38,27 +38,48 @@ def Login(request):
     return render(request,"login.html")
 
 def Showbook(request):
-    if request.method == "POST":
-        url = 'https://www.googleapis.com/books/v1/volumes?q='
-        search = request.POST.get('search')
-        response = requests.get(url + search)
-        obj = json.loads(response.text)
-        bookdata =[]
-
-        for i in range(len(obj['items'])):
-            x = obj['items'][i]['volumeInfo']['authors']
-            y = obj['items'][i]['volumeInfo']['title']
-            w = obj['items'][i]['volumeInfo']['imageLinks']['thumbnail']
-            i = obj['items'][i]['id']
-            book = {"author":x[0],
-                    "title":y,
-                    "img":w,
-                    "bkid":i
-                    }
-            bookdata.append(book)
+    user = request.user
+    if user.is_authenticated:
+        if request.method == "POST":
+            url = 'https://www.googleapis.com/books/v1/volumes?q='
+            search = request.POST.get('search')
+            response = requests.get(url + search)
+            obj = json.loads(response.text)
+            bookdata =[]
             user = request.user
             stname = Store.objects.filter(user=user)
-    return render(request, "showbook.html",{"bookdata":bookdata,"stname":stname})
+            try:
+                for i in range(len(obj['items'])):
+                    x = obj['items'][i]['volumeInfo']['authors']
+                    y = obj['items'][i]['volumeInfo']['title']
+                    w = obj['items'][i]['volumeInfo']['imageLinks']['thumbnail']
+                    i = obj['items'][i]['id']
+                    book = {"author":x[0],
+                            "title":y,
+                            "img":w,
+                            "bkid":i
+                            }
+                    bookdata.append(book)
+            except KeyError:
+                for i in range(len(obj['items'])):
+                    # x = obj['items'][i]['volumeInfo']['authors']
+                    y = obj['items'][i]['volumeInfo']['title']
+                    w = obj['items'][i]['volumeInfo']['imageLinks']['thumbnail']
+                    i = obj['items'][i]['id']
+                    book = {
+                        # "author":x[0],
+                            "title":y,
+                            "img":w,
+                            "bkid":i
+                            }
+                    bookdata.append(book)
+            finally:
+                return render(request, "showbook.html", {"bookdata": bookdata, "stname": stname})
+        else:
+            print(request,"login show search books")
+            return redirect('showbook')
+    else:
+        return Home(request)
 def Bookstore(request):
     if request.method == "POST":
         idd = request.POST.get("id")
@@ -69,48 +90,57 @@ def Bookstore(request):
             if i.store_name == name:
                 book = Book(Book_id=idd,store=i)
                 book.save()
-                return Booksearch(request)
+                return redirect('showbook')
             else:
                 return HttpResponse("failed")
+    return Home(request)
 def CreateStore(request):
-    if request.method == "POST":
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            user = request.user
+            stname = Store.objects.filter(user=user)
+            name = request.POST.get("name")
+            data = Store(store_name=name,user=request.user)
+            data.save()
+            return render(request,"createstore.html",{"stname":stname})
         user = request.user
         stname = Store.objects.filter(user=user)
-        name = request.POST.get("name")
-        data = Store(store_name=name,user=request.user)
-        data.save()
         return render(request,"createstore.html",{"stname":stname})
-    user = request.user
-    stname = Store.objects.filter(user=user)
-    return render(request,"createstore.html",{"stname":stname})
+    else:
+        return Home(request)
 def ShowStore(request):
-    if request.method=="POST":
-        name = request.POST.get("stname")
-        user = request.user
-        store = Store.objects.filter(user=user,store_name=name)
-        bookdata = []
-        for i in store:
-            if i.store_name == name:
-                book = Book.objects.filter(store=i)
-                bookdata=[]
-                for j in book.iterator():
-                    url = 'https://www.googleapis.com/books/v1/volumes?q='
-                    response = requests.get(url + j.Book_id)
-                    obj = json.loads(response.text)
-                    x = obj['items'][0]['volumeInfo']['authors']
-                    y = obj['items'][0]['volumeInfo']['title']
-                    w = obj['items'][0]['volumeInfo']['imageLinks']['thumbnail']
-                    c = obj['items'][0]['id']
-                    book = {"author": x[0],
-                            "title": y,
-                            "img": w,
-                            "bkid":c,
-                            "copy":j.no_copis,
-                            "name" : name
-                            }
-                    bookdata.append(book)
-        return render(request,"showstore.html",{"data":bookdata,"name":name})
-    return Home(request)
+    user = request.user
+    if user.is_authenticated:
+        if request.method=="POST":
+            name = request.POST.get("stname")
+            user = request.user
+            store = Store.objects.filter(user=user,store_name=name)
+            bookdata = []
+            for i in store:
+                if i.store_name == name:
+                    book = Book.objects.filter(store=i)
+                    bookdata=[]
+                    for j in book.iterator():
+                        url = 'https://www.googleapis.com/books/v1/volumes?q='
+                        response = requests.get(url + j.Book_id)
+                        obj = json.loads(response.text)
+                        x = obj['items'][0]['volumeInfo']['authors']
+                        y = obj['items'][0]['volumeInfo']['title']
+                        w = obj['items'][0]['volumeInfo']['imageLinks']['thumbnail']
+                        c = obj['items'][0]['id']
+                        book = {"author": x[0],
+                                "title": y,
+                                "img": w,
+                                "bkid":c,
+                                "copy":j.no_copis,
+                                "name" : name
+                                }
+                        bookdata.append(book)
+                    return render(request,"showstore.html",{"data":bookdata,"name":name})
+        else:
+            return redirect('showstore')
+    else:
+        return Home(request)
 def UpdateCopies(request):
     if request.method == "POST":
         copies = request.POST.get("copy")
@@ -135,7 +165,7 @@ def DeleteBook(request):
             if i.store_name == name:
                 book = Book.objects.get(Book_id=idd,store =i)
                 book.delete()
-    return redirect('showstore')
+    return redirect('createstore')
 def DeleteStore(request):
     if request.method == "POST":
         name = request.POST.get("sname")
