@@ -1,1 +1,1 @@
-web: gunicorn bookinventory.wsgi:
+web: gunicorn app:app
