@@ -1,1 +1,1 @@
-web: gunicorn bookinventory:application --log-file -
+web: gunicorn bookinventory:application
