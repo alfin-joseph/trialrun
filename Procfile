@@ -1,1 +1,1 @@
-web: gunicorn bookinventory:application
+web: gunicorn bookinventory:applicn
